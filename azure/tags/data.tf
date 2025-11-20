@@ -37,5 +37,6 @@ data "external" "git" {
 data "azurerm_client_config" "current" {}
 
 data "azurerm_subscription" "current" {
-  subscription_id = data.azurerm_client_config.current.subscription_id
+  # To avoid cycle dependendy when managing subscription tags
+  subscription_id = var.manage_subscription_tags != null ? var.manage_subscription_tags : data.azurerm_client_config.current.subscription_id
 }

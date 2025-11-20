@@ -28,10 +28,10 @@ locals {
     for k, v in data.azurerm_subscription.current.tags : k => v if contains(local.keys_to_use, k)
   }
 
-  # If var.manage_subscription_tags is true, ignore filtering rules and include all tags from subscription.
+  # If var.manage_subscription_tags is an subscription_id, ignore filtering rules and include all tags from subscription.
   # If false, use filtered map from local.filtered_subscription_tags
   # This is used when this module is used to managed tags on a subscription level, not on resource level (which is the default intended usecase)
-  subscription_tags = var.manage_subscription_tags ? data.azurerm_subscription.current.tags : local.filtered_subscription_tags
+  subscription_tags = var.manage_subscription_tags != null ? data.azurerm_subscription.current.tags : local.filtered_subscription_tags
 
   # Merge maps. Ordering here is important.
   final_common_tags = merge( # Note: last entry wins

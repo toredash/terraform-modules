@@ -14,8 +14,8 @@ variable "tags_to_filter" {
 }
 
 variable "manage_subscription_tags" {
-  type        = bool
-  nullable    = false
-  default     = false
-  description = "If this module is used to manage tags on a subscription, set this value to true. The module will then inherit all current tags on a subscription, and add required tags it needed."
+  type        = string
+  nullable    = true
+  default     = null
+  description = "If this module is used to manage tags on a subscription, set this value to the subscription_id. The module will then inherit all current tags on a subscription, and add required tags it needed."
 }
