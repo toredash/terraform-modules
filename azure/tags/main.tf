@@ -1,28 +1,27 @@
 locals {
-  common_tags = {
+  required_tags = {
     # These are the required tags that should always be present. They match the Tag Governance doument
     "business_unit"     = ""
     "cost_center"       = ""
     "environment"       = ""
     "owner"             = ""
-    "criticality"       = ""
     "technical_contact" = ""
+  }
+  common_tags = {
     # The following tag is not listed in tag governance. Included by default, gives visibility when navigating the Azure UI on where resources was defined.
     "repository" = data.external.git.result.url
   }
-}
 
-locals {
   # Combine keys from the base map and the input variable
   # This is used to filter in the required tags for azure resources.
   keys_to_use = distinct(
     concat(
-      keys(local.common_tags), var.tags_to_filter
+      keys(local.required_tags), keys(local.common_tags), var.tags_to_filter
     )
   )
 
   # Filter out tags at subscription level that is not needed on Azure resources.
-  # Not all tags are equal. By default the ones specified in local.common_tags must be 
+  # Not all tags are equal. By default the ones specified in local.common_tags must be
   # present on all resources. Module caller can override the defaults via var.keys_to_use
   filtered_subscription_tags = {
     for k, v in data.azurerm_subscription.current.tags : k => v if contains(local.keys_to_use, k)
@@ -35,8 +34,9 @@ locals {
 
   # Merge maps. Ordering here is important.
   final_common_tags = merge( # Note: last entry wins
-    local.common_tags,
+    local.required_tags,
     local.subscription_tags,
+    local.common_tags,
     var.additional_tags,
   )
 }
